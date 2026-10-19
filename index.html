@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>FilterMagic - cute live camera filters</title>
+  <meta name="description" content="Try 30 super-cute live camera filters in your browser. Take selfies, download them, and keep everything private on your device.">
+  <meta name="theme-color" content="#fff1f8">
+  <link rel="icon" href="public/favicon.svg" type="image/svg+xml">
+  <script>
+    try {
+      var s = JSON.parse(localStorage.getItem('filtermagic:v1') || '{}');
+      document.documentElement.dataset.theme = s.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="src/styles/main.css">
+  <link rel="stylesheet" href="src/styles/camera.css">
+  <link rel="stylesheet" href="src/styles/filters.css">
+  <link rel="stylesheet" href="src/styles/responsive.css">
+  <script type="module" src="src/main.js"></script>
+</head>
+<body data-mode="live">
+  <div class="confetti" aria-hidden="true"><span>✨</span><span>💖</span><span>⭐</span><span>🌸</span><span>💫</span><span>🎀</span></div>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="FilterMagic home"><span class="brand-logo">🌸</span><span class="brand-name">FilterMagic</span></a>
+    <div class="mode-switch" role="tablist" aria-label="Mode">
+      <button id="modeLive" type="button" role="tab" aria-selected="true">📷 Live</button>
+      <button id="modeEdit" type="button" role="tab" aria-selected="false">🖼️ Edit</button>
+    </div>
+    <button id="themeToggle" class="icon-btn" type="button" aria-label="Switch to dark mode">🌙</button>
+  </header>
+
+  <main class="layout">
+    <section class="studio card" aria-label="Camera studio">
+      <div class="stage" id="stage">
+        <canvas id="viewCanvas" aria-label="Live preview with filter"></canvas>
+        <canvas id="beforeCanvas" aria-hidden="true" hidden></canvas>
+        <div class="compare-line" id="compareLine" hidden></div>
+        <div class="compare-badges" id="compareBadges" hidden><span>Before</span><span>After</span></div>
+
+        <div class="state-panel" id="statePanel">
+          <div class="state-icon" id="stateIcon">🌸</div>
+          <div class="spinner" id="stateSpinner" hidden></div>
+          <h2 id="stateTitle">Ready for your close-up?</h2>
+          <p id="stateText"></p>
+          <button class="btn primary" id="stateAction" type="button">Start camera</button>
+        </div>
+
+        <div class="face-hint" id="faceHint" role="status" hidden></div>
+        <div class="countdown" id="countdown" aria-live="assertive" hidden></div>
+        <div class="flash" id="flash"></div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </div>
+
+      <input class="compare-slider" id="compareSlider" type="range" min="0" max="100" value="50" aria-label="Before and after position" hidden>
+
+      <div class="shutter-row">
+        <button id="uploadBtn" class="round-btn" type="button" aria-label="Upload a photo"><span class="ico">🖼️</span><span class="label">Upload</span></button>
+        <button id="timerBtn" class="round-btn live-only" type="button" aria-label="Timer off"><span class="ico">⏱️</span><span class="label">Off</span></button>
+        <button id="shutterBtn" class="shutter live-only" type="button" aria-label="Take photo"><span></span></button>
+        <button id="downloadBtn" class="btn primary big edit-only" type="button">⬇️ Download PNG</button>
+        <button id="switchBtn" class="round-btn live-only" type="button" aria-label="Switch front or rear camera" hidden><span class="ico">🔄</span><span class="label">Flip cam</span></button>
+        <button id="mirrorBtn" class="round-btn" type="button" aria-label="Mirror preview" aria-pressed="true"><span class="ico">🪞</span><span class="label">Mirror</span></button>
+        <button id="retakeBtn" class="round-btn edit-only" type="button" aria-label="Retake photo"><span class="ico">🔁</span><span class="label">Retake</span></button>
+      </div>
+
+      <div class="tool-row">
+        <div class="slider-group">
+          <label for="intensity"><span id="activeName">📷 Original</span> <output id="intensityValue" for="intensity">100%</output></label>
+          <input id="intensity" type="range" min="0" max="100" value="100" aria-label="Filter intensity">
+        </div>
+        <div class="tool-buttons">
+          <button id="favBtn" class="chip-btn" type="button" aria-pressed="false"><span class="ico">🤍</span><span class="label">Save</span></button>
+          <button id="compareBtn" class="chip-btn" type="button" aria-pressed="false"><span class="ico">↔️</span><span class="label">Compare</span></button>
+          <button id="resetBtn" class="chip-btn" type="button"><span class="ico">♻️</span><span class="label">Reset</span></button>
+          <button id="cameraToggle" class="chip-btn live-only" type="button" aria-pressed="false"><span class="ico">📷</span><span class="label">Camera off</span></button>
+        </div>
+      </div>
+      <input id="fileInput" type="file" accept="image/*" hidden>
+    </section>
+
+    <section class="filters card" aria-label="Filters">
+      <div class="filters-head">
+        <h2>Filters <span class="count">30</span></h2>
+        <label class="search"><span class="sr-only">Search filters</span><input id="filterSearch" type="search" placeholder="Search filters…" autocomplete="off"></label>
+      </div>
+      <div class="tabs" id="filterTabs" role="tablist" aria-label="Filter categories"></div>
+      <div class="carousel-wrap">
+        <button id="scrollLeft" class="scroll-btn" type="button" aria-label="Scroll filters left">‹</button>
+        <div class="carousel" id="filterList"></div>
+        <button id="scrollRight" class="scroll-btn" type="button" aria-label="Scroll filters right">›</button>
+      </div>
+      <p class="empty" id="filterEmpty" hidden></p>
+    </section>
+
+    <section class="gallery card" aria-label="Photo gallery">
+      <div class="filters-head">
+        <h2>My photos</h2>
+        <button id="clearGallery" class="chip-btn" type="button" hidden>Clear all</button>
+      </div>
+      <p class="empty" id="galleryEmpty">Photos you take show up here. They stay in this tab and are never uploaded.</p>
+      <div class="photo-grid" id="galleryGrid"></div>
+    </section>
+  </main>
+
+  <footer class="foot">Made with 💖 · Everything runs on your device. Photos are never uploaded.</footer>
+
+  <video id="video" class="sr-video" playsinline muted autoplay></video>
+</body>
+</html>

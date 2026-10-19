@@ -1,0 +1,91 @@
+/* Stage, state panel, countdown, flash, shutter and tool rows */
+.studio { display: grid; gap: 14px; }
+.stage {
+  --ar: 0.75;
+  position: relative; margin: 0 auto; overflow: hidden;
+  aspect-ratio: var(--ar);
+  width: min(100%, calc(66dvh * var(--ar)));
+  min-width: min(100%, 260px);
+  border-radius: 22px; background: linear-gradient(160deg, #ffe3f1, #e6dcff);
+  border: 3px solid #fff; box-shadow: 0 0 0 2px var(--border), 0 14px 30px rgba(183, 156, 255, 0.35);
+}
+[data-theme="dark"] .stage { border-color: #3c2b4d; background: linear-gradient(160deg, #3a2650, #25193a); }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#beforeCanvas { z-index: 2; }
+
+.compare-line { position: absolute; z-index: 3; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: #fff; box-shadow: 0 0 10px rgba(0, 0, 0, 0.35); }
+.compare-badges { position: absolute; z-index: 3; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; pointer-events: none; }
+.compare-badges span { background: rgba(0, 0, 0, 0.45); color: #fff; padding: 4px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+.compare-slider { width: min(100%, 520px); margin: 0 auto; }
+
+.state-panel {
+  position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; padding: 22px; text-align: center;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--bg) 94%, #ffd3e7), color-mix(in srgb, var(--bg2) 96%, transparent));
+}
+.state-panel h2 { font-size: 1.25rem; }
+.state-panel p { margin: 0 0 6px; color: var(--muted); max-width: 34ch; line-height: 1.45; font-size: 0.95rem; }
+.state-icon { font-size: 3.4rem; animation: bob 2.6s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-8px) scale(1.05); } }
+.spinner { width: 46px; height: 46px; border-radius: 50%; border: 5px solid var(--border); border-top-color: var(--pink-deep); animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.face-hint {
+  position: absolute; z-index: 4; left: 50%; bottom: 14px; transform: translateX(-50%);
+  max-width: 88%; padding: 7px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; text-align: center;
+  color: #fff; background: rgba(60, 30, 70, 0.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+
+.countdown {
+  position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; pointer-events: none;
+  font-size: min(34vw, 190px); font-weight: 900; color: #fff;
+  text-shadow: 0 6px 30px rgba(236, 79, 152, 0.85), 0 0 8px rgba(0, 0, 0, 0.25);
+}
+.countdown.tick { animation: tick 1s ease-out; }
+@keyframes tick { 0% { transform: scale(1.7); opacity: 0; } 25% { opacity: 1; } 100% { transform: scale(0.85); opacity: 0.85; } }
+
+.flash { position: absolute; inset: 0; z-index: 8; background: #fff; opacity: 0; pointer-events: none; }
+.flash.go { animation: flash 0.55s ease-out; }
+@keyframes flash { 0% { opacity: 0.95; } 100% { opacity: 0; } }
+
+.toast {
+  position: absolute; z-index: 9; top: 12px; left: 50%; transform: translate(-50%, -20px); opacity: 0; pointer-events: none;
+  background: var(--card-solid); color: var(--text); border: 1px solid var(--border); box-shadow: var(--shadow);
+  padding: 9px 16px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; max-width: 92%; text-align: center;
+  transition: opacity 0.25s, transform 0.25s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.shutter-row { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.round-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-width: 62px; min-height: 62px; padding: 6px 8px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--card-solid); transition: transform 0.15s, background 0.2s;
+}
+.round-btn .ico { font-size: 1.35rem; line-height: 1; }
+.round-btn .label { font-size: 0.7rem; font-weight: 700; color: var(--muted); }
+.round-btn:active { transform: scale(0.92); }
+.round-btn[aria-pressed="true"] { background: linear-gradient(135deg, #ffe0ef, #ece3ff); border-color: var(--pink); }
+[data-theme="dark"] .round-btn[aria-pressed="true"] { background: linear-gradient(135deg, #5a2f55, #3f2f6b); }
+
+.shutter {
+  position: relative; width: 78px; height: 78px; border-radius: 50%; border: 5px solid #fff; padding: 0;
+  background: linear-gradient(135deg, var(--pink), var(--lav));
+  box-shadow: 0 0 0 3px var(--pink), 0 10px 24px rgba(236, 79, 152, 0.45); transition: transform 0.15s;
+}
+.shutter span { position: absolute; inset: 14px; border-radius: 50%; background: #fff; transition: transform 0.15s; }
+.shutter:hover span { transform: scale(0.92); }
+.shutter:active { transform: scale(0.92); }
+.shutter.counting span { background: var(--pink-deep); inset: 24px; border-radius: 8px; }
+
+.tool-row { display: grid; gap: 10px; }
+.slider-group { display: grid; gap: 4px; }
+.slider-group label { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.95rem; }
+.slider-group output { color: var(--pink-deep); }
+.tool-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 34px; background: transparent; margin: 0; }
+input[type="range"]::-webkit-slider-runnable-track { height: 10px; border-radius: 99px; background: linear-gradient(90deg, var(--pink), var(--lav)); }
+input[type="range"]::-moz-range-track { height: 10px; border-radius: 99px; background: linear-gradient(90deg, var(--pink), var(--lav)); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; margin-top: -9px; border-radius: 50%; background: #fff; border: 4px solid var(--pink-deep); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25); }
+input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 4px solid var(--pink-deep); }
